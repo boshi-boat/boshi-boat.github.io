@@ -1,0 +1,1086 @@
+
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta name="keywords" content="パチンコ,期待値,計算">
+<meta name="description" content="パチンコの期待値を計算します。">
+<title>実績入力／計算</title>
+<!-- <link rel="stylesheet" type="text/css" href="jisseki.css?date=20160309" media="screen">
+-->
+<!-- ▼ファビコン設置箇所▼
+※ファビコンを使用する際はコメントアウトを消してください。-->
+<!-- /<link rel="shortcut icon" href="icon URL.ico"> -->
+<!-- ▲ファビコン設置箇所▲ -->
+<script src="./jquery-2.1.4.min.js"></script>
+<script src="./autosize.js?date=20160309"></script>
+<script src="./common.js?date=20160309"></script>
+<script src="./jisseki.js?date=20160309"></script>
+<script>
+	$(function() {
+
+		var pair = location.search.substring(1).split('=');
+
+		console.log(pair);
+
+		// 初期表示値の設定
+		switch(pair[1]){
+			case "1":
+				var dispValue = JSON.parse('{"kishuInfo":{"id":"155","name":"\u771f\u30fb\u5317\u6597\u7121\u53cc \u5922\u5e7b\u95d8\u4e71 SWA","tokaBorder":"19.000","totalRate":"29.220","denSupRate":"0.930","rironAveDedama":"408.060","default1R":"90","active":"1"},"kishuAtariInfo":[{"id":"155","no":"1","upDown1":"down","round1":"2","upDown2":"-","round2":"0","roundSum":"2","tamasu":"180","shutsugenRate":"8.800"},{"id":"155","no":"2","upDown1":"down","round1":"3","upDown2":"-","round2":"0","roundSum":"3","tamasu":"270","shutsugenRate":"29.400"},{"id":"155","no":"3","upDown1":"down","round1":"4","upDown2":"-","round2":"0","roundSum":"4","tamasu":"360","shutsugenRate":"47.600"},{"id":"155","no":"4","upDown1":"down","round1":"8","upDown2":"-","round2":"0","roundSum":"8","tamasu":"720","shutsugenRate":"7.000"},{"id":"155","no":"5","upDown1":"down","round1":"12","upDown2":"-","round2":"0","roundSum":"12","tamasu":"1080","shutsugenRate":"3.500"},{"id":"155","no":"6","upDown1":"down","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"1440","shutsugenRate":"3.700"}]}');
+				break;
+			case "2":
+				var dispValue = JSON.parse('{"kishuInfo":{"id":"143","name":"\u771f.\u5317\u6597\u7121\u53cc 1\/219","tokaBorder":"18.000","totalRate":"89.578","denSupRate":"0.740","rironAveDedama":"1237.320","default1R":"140","active":"1"},"kishuAtariInfo":[{"id":"143","no":"1","upDown1":"down","round1":"4","upDown2":"-","round2":"0","roundSum":"4","tamasu":"560","shutsugenRate":"23.300"},{"id":"143","no":"2","upDown1":"down","round1":"6","upDown2":"-","round2":"0","roundSum":"6","tamasu":"840","shutsugenRate":"40.300"},{"id":"143","no":"3","upDown1":"down","round1":"8","upDown2":"-","round2":"0","roundSum":"8","tamasu":"1120","shutsugenRate":"4.200"},{"id":"143","no":"4","upDown1":"down","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"2240","shutsugenRate":"32.200"}]}');
+				break;
+			case "3":
+				var dispValue = JSON.parse('{"kishuInfo":{"id":"55","name":"\u771f\u30fb\u5317\u6597\u7121\u53cc","tokaBorder":"16.800","totalRate":"86.793","denSupRate":"0.780","rironAveDedama":"1289.120","default1R":"140","active":"1"},"kishuAtariInfo":[{"id":"55","no":"1","upDown1":"up","round1":"4","upDown2":"-","round2":"0","roundSum":"4","tamasu":"560","shutsugenRate":"30.700"},{"id":"55","no":"2","upDown1":"up","round1":"6","upDown2":"-","round2":"0","roundSum":"6","tamasu":"840","shutsugenRate":"27.000"},{"id":"55","no":"3","upDown1":"up","round1":"8","upDown2":"-","round2":"0","roundSum":"8","tamasu":"1120","shutsugenRate":"5.100"},{"id":"55","no":"4","upDown1":"up","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"2240","shutsugenRate":"37.200"}]}');
+				break;
+			case "4":
+				var dispValue = JSON.parse('{"kishuInfo":{"id":"118","name":"\u30b9\u30fc\u30d1\u30fc\u6d77\u7269\u8a9eIN\u6c96\u7e044 MTC","tokaBorder":"18.750","totalRate":"105.664","denSupRate":"0.610","rironAveDedama":"1408.000","default1R":"88","active":"1"},"kishuAtariInfo":[{"id":"118","no":"1","upDown1":"down","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"1408","shutsugenRate":"100.000"}]}');
+				break;
+		}
+
+		var kishuInfo = dispValue['kishuInfo'];
+
+		var kishuID = kishuInfo['id'];
+		$("#kishuID").text(kishuID);
+
+		var kishuName = kishuInfo['name'];
+		$("#kishuName").text(kishuName);
+
+		var totalRate = kishuInfo['totalRate'];
+		var denSupRate = kishuInfo['denSupRate'];
+		var rironAveDedama = kishuInfo['rironAveDedama'];
+
+		var default1R = kishuInfo['default1R'];
+		$('#default1R').text(kishuInfo['default1R']);
+
+		var kishuAtariInfoStrIniDisp = '<br>';
+		$.each(dispValue['kishuAtariInfo'], function(index){
+			kishuAtariInfoStrIniDisp += String(index + 1) + '：';
+			if (this['upDown1'] != '' && this['upDown1'] != '-') {
+				kishuAtariInfoStrIniDisp += (this['upDown1'] == 'up' ? '上' : '下') + this['round1'] + 'R'
+			}
+			if (this['upDown2'] != '' && this['upDown2'] != '-') {
+				kishuAtariInfoStrIniDisp += (this['upDown2'] == 'up' ? '上' : '下') + this['round2'] + 'R'
+			}
+			kishuAtariInfoStrIniDisp += '：' + addCommaEx(this['tamasu']) + '玉<br>';
+		});
+		kishuAtariInfoStrIniDisp += '<br>';
+		$('#atariInfo').html(kishuAtariInfoStrIniDisp);
+
+		// localStrageから初期表示値を取得
+		getFromStrageToForm();
+		if ($('#dispMaxNo').val() == '') {
+			$('#dispMaxNo').val('10');
+		}
+		for(var i = 1; i <= 80; i++) {
+			if (i > $('#dispMaxNo').val()) {
+				$('#tr' + i).css('display', 'none');
+			}
+		}
+
+		$(".calc").click(function() {
+			// ゼロ変換
+			$.each($("#zantama_command, #toushi_command, #mochikomi_command, #mochidashi_command, #dedamachikan, #kashidama, #kankin, #chakusekiAll"), function() {
+				changeValToZero($(this));
+			});
+			// 入力チェック
+			var msgStr = inputValCheck(dispValue['kishuAtariInfo']);
+			if (msgStr != '') {
+				alert(msgStr);
+				return;
+			}
+
+			// 計算結果の連想配列
+			var calcResultAll = {};
+			// コマンド系の合計
+			calcResultAll['zantamaSum'] = sumCommandStr($('#zantama_command').val()); // 残玉
+			calcResultAll['toushiSum'] = sumCommandStr($('#toushi_command').val()); // 現金投資
+			calcResultAll['mochikomiSum'] = sumCommandStr($('#mochikomi_command').val()); // 持込玉
+			calcResultAll['mochidashiSum'] = sumCommandStr($('#mochidashi_command').val()); // 持出玉
+
+			// 遊戯履歴合計系
+			calcResultAll['sumTsujoSimple'] = sumValuesFromArray($('.tsujo')); // 通常回転合計
+			calcResultAll['sumDensup'] = sumValuesFromArray($('.densup')); // 電サポ合計
+			calcResultAll['sumAtariCnt'] = cntValuesFromArray($('.atariNo')); // 当選回数
+			calcResultAll['sumPlusminus'] = sumValuesFromArray($('.plusMinus')); // 増減合計
+			calcResultAll['sumSupNuke'] = sumValuesFromArray($('.supNuke')); // サポ抜合計
+			calcResultAll['sumTsujoAll'] = calcResultAll.sumTsujoSimple - calcResultAll.sumSupNuke; // 通常総回転
+			calcResultAll['sumDensupAll'] = calcResultAll.sumDensup + calcResultAll.sumSupNuke; // 電サポ総回転
+			//calcResultAll['denSupPlusminusRate'] = calcResultAll.sumAtariCnt > 0 ? calcResultAll.sumPlusminus / calcResultAll.sumDensupAll : 0.01; // 電サポ増減率
+			var denSupPlusminusRate = parseFloatEx(calcResultAll.sumPlusminus / calcResultAll.sumDensupAll);
+			calcResultAll['denSupPlusminusRate'] = denSupPlusminusRate == 0 ? 0.01 : denSupPlusminusRate; // 電サポ増減率
+
+			calcResultAll['dedamaChikan'] = parseFloatEx($('#dedamachikan').val()); // 出玉置換
+			calcResultAll['rironAveDedama'] = 0; // 理論平均出玉
+
+			calcResultAll['atariCntArray'] = new Array(dispValue['kishuAtariInfo'].length); // 当選回数配列
+			calcResultAll['kakutokuTamaAll'] = 0; // 総獲得玉数
+			$.each(dispValue['kishuAtariInfo'], function(index) {
+				calcResultAll.atariCntArray[index] = 0;
+				calcResultAll.rironAveDedama += this['roundSum'] * calcResultAll.dedamaChikan * (this['shutsugenRate'] / 100);
+			});
+			$.each($('.atariNo'), function() {
+				if ($(this).val() != '') {
+					calcResultAll.atariCntArray[$(this).val() -1]++;
+				}
+			});
+			$.each(dispValue['kishuAtariInfo'], function(index) {
+				calcResultAll.kakutokuTamaAll += this['roundSum'] * calcResultAll.dedamaChikan * calcResultAll.atariCntArray[index];
+			});
+			calcResultAll['kankin'] = parseFloatEx($('#kankin').val()); // 換金率
+			calcResultAll['sumKakutokuMoney'] = (calcResultAll.zantamaSum + calcResultAll.mochidashiSum) * calcResultAll.kankin; // 総獲得金額
+			calcResultAll['sumToshiMoney'] = calcResultAll.toushiSum + (calcResultAll.mochikomiSum * calcResultAll.kankin); // 総投資金額
+			calcResultAll['bunshi'] = calcResultAll.sumTsujoAll / ((calcResultAll.toushiSum +
+										((calcResultAll.kakutokuTamaAll + calcResultAll.mochikomiSum + calcResultAll.sumPlusminus -
+											calcResultAll.zantamaSum - calcResultAll.mochidashiSum) * 4)) / 1000) // 分子の値
+
+			calcResultAll['kashidama'] = parseIntEx($('#kashidama').val()); // 貸玉率
+
+			calcResultAll['rironDensupKaiten'] = calcResultAll.sumTsujoAll * parseFloatEx(kishuInfo['denSupRate']); // 理論電サ回転
+			calcResultAll['rironDensupPlusminus'] = calcResultAll.rironDensupKaiten * calcResultAll.denSupPlusminusRate; // 理論電サ増減
+
+			calcResultAll['shushi'] = calcResultAll.sumKakutokuMoney - calcResultAll.sumToshiMoney; // 収支
+			calcResultAll['mochidamaRate'] = ((calcResultAll.mochikomiSum + calcResultAll.kakutokuTamaAll + calcResultAll.sumPlusminus - calcResultAll.zantamaSum - calcResultAll.mochidashiSum) *
+												(1000 / calcResultAll.kashidama)) /
+												(((calcResultAll.mochikomiSum + calcResultAll.kakutokuTamaAll + calcResultAll.sumPlusminus - calcResultAll.mochidashiSum - calcResultAll.zantamaSum) *
+												(1000 / calcResultAll.kashidama)) + calcResultAll.toushiSum) * 100; // 持出率
+			calcResultAll['workVolume'] = (((parseFloatEx(calcResultAll.rironAveDedama) * calcResultAll.kankin) - (parseFloatEx(kishuInfo['totalRate']) / calcResultAll.bunshi * 1000)) *
+											(calcResultAll.sumTsujoAll / parseFloatEx(kishuInfo['totalRate'])) * (1 - (calcResultAll.mochidamaRate / 100))) +
+											((calcResultAll.sumTsujoAll / parseFloatEx(kishuInfo['totalRate'])) * ((calcResultAll.rironAveDedama -
+											(parseFloatEx(kishuInfo['totalRate']) / calcResultAll.bunshi * 250)) * calcResultAll.kankin) * (calcResultAll.mochidamaRate / 100)) +
+											(calcResultAll.rironDensupPlusminus * calcResultAll.kankin); // 仕事量
+
+			calcResultAll['sogoKaiten'] = calcResultAll.sumTsujoAll + calcResultAll.sumDensupAll; // 総合回転
+			//calcResultAll['plusMinusRate'] = calcResultAll.sumAtariCnt > 0 ? calcResultAll.sumPlusminus / calcResultAll.sumDensupAll : 0.01; // 増減率
+			var plusMinusRate = parseFloatEx(calcResultAll.sumPlusminus / calcResultAll.sumDensupAll);
+			calcResultAll['plusMinusRate'] = plusMinusRate == 0 ? 0.01 : plusMinusRate; // 増減率
+
+			calcResultAll['kishuAtariInfoStrHistory'] = ''; // 出玉置換で出した玉数の当情報
+			$.each(dispValue['kishuAtariInfo'], function(index){
+				calcResultAll.kishuAtariInfoStrHistory += String(index + 1) + '：';
+				if (this['upDown1'] != '' && this['upDown1'] != '-') {
+					calcResultAll.kishuAtariInfoStrHistory += (this['upDown1'] == 'up' ? '上' : '下') + this['round1'] + 'R'
+				}
+				if (this['upDown2'] != '' && this['upDown2'] != '-') {
+					calcResultAll.kishuAtariInfoStrHistory += (this['upDown2'] == 'up' ? '上' : '下') + this['round2'] + 'R'
+				}
+				calcResultAll.kishuAtariInfoStrHistory += '：' + addCommaEx(roundEx(calcResultAll.dedamaChikan * this['roundSum'], 2)) + '玉\n';
+			});
+
+			calcResultAll['atariConcatStr'] = ''; // 当情報結合文字列
+			$.each(dispValue['kishuAtariInfo'], function(index){
+				var roundSum = parseIntEx(this['roundSum']);
+				var hidari = addCommaEx(roundEx(calcResultAll.dedamaChikan * roundSum, 0)) + '：';
+				var migi = calcResultAll.atariCntArray[index] + '回';
+				calcResultAll['atariConcatStr'] += (hidari + migi + '\n');
+			});
+
+			calcResultAll['playHistoryConStr'] = ''; // 遊戯履歴結合文字列
+			for(var i = 1; i < 81; i++) {
+				var tsujo = $('#td' + String(i) + '_2').val();
+				var denSup = $('#td' + String(i) + '_3').val();
+				var atariNo = $('#td' + String(i) + '_4').val();
+				var plusMinus = $('#td' + String(i) + '_5').val();
+				var supNuke = $('#td' + String(i) + '_6').val();
+				// 1つでも入力してれば結合対象
+				if(tsujo != '' || denSup != '' || atariNo != '' || plusMinus != '' || supNuke != '') {
+					calcResultAll.playHistoryConStr += (tsujo + '#' + denSup + '#' + atariNo + '#' + plusMinus + '#' + supNuke + '\n');
+				}
+			}
+			calcResultAll['tokaBorder'] = parseFloatEx(kishuInfo['totalRate']) / ((calcResultAll.rironAveDedama + parseFloatEx(kishuInfo['totalRate']) * parseFloatEx(kishuInfo['denSupRate']) * calcResultAll.denSupPlusminusRate) / 250);
+console.log(calcResultAll);
+console.log(kishuInfo);
+
+			$("#result").val(
+				'機種番号：' + kishuID + '\n' +
+				kishuName + '\n' +
+				'\n' +
+				addCommaExWithPadding(calcResultAll.bunshi, 2) + '/' + addCommaExWithPadding(calcResultAll.tokaBorder, 2) + '\n' +
+				'収支：' + addCommaEx(roundEx(calcResultAll.shushi, 0)) + '円\n' +
+				'仕事量：' + addCommaEx(roundEx(calcResultAll.workVolume, 0)) + '円\n' +
+				'持玉率：' + roundEx(calcResultAll.mochidamaRate, 2) + '%\n' +
+				'\n' +
+				'通常回転：' + addCommaEx(calcResultAll.sumTsujoAll) + '\n' +
+				'電サポ回転：' + addCommaEx(calcResultAll.sumDensupAll) + '回\n' +
+				'総合回転：' + addCommaEx(calcResultAll.sogoKaiten) + '回\n' +
+				'電サポ増減：' + addCommaEx(calcResultAll.sumPlusminus) + '玉\n' +
+				'増減率：' + addCommaExWithPadding(calcResultAll.plusMinusRate, 2) + '玉\n' +
+				'\n' +
+				'現金投資：' + addCommaEx(calcResultAll.toushiSum) + '円\n' +
+				'持込玉：' + addCommaEx(calcResultAll.mochikomiSum) + '玉\n' +
+				'持出玉：' + addCommaEx(calcResultAll.mochidashiSum) + '玉\n' +
+				'残玉：' + addCommaEx(calcResultAll.zantamaSum) + '玉\n' +
+				'\n' +
+				'■当：' + calcResultAll.sumAtariCnt + '回\n' +
+				calcResultAll.atariConcatStr +
+				'出玉置換：' + calcResultAll.dedamaChikan + '玉\n' +
+				'※1R標準：' + addCommaEx(parseFloatEx(kishuInfo['default1R'])) + '玉\n' +
+				'-------------------------------------\n' +
+				'機種番号：' + kishuID + '\n' +
+				kishuName + '\n' +
+				calcResultAll.kishuAtariInfoStrHistory +
+				'\n' +
+				'出玉置換：' + calcResultAll.dedamaChikan + '\n' +
+				'増減率：' + addCommaExWithPadding(roundEx(calcResultAll.plusMinusRate, 2), 2) + '\n' +
+				'\n' +
+				'現金投資(入力)：' + $('#toushi_command').val() + '\n' +
+				'持込玉：' + $('#mochikomi_command').val() + '\n' +
+				'持出玉：' + $('#mochidashi_command').val() + '\n' +
+				'\n' +
+				'残玉(入力)：' + $('#zantama_command').val() + '\n' +
+				'\n' +
+				'※着席時総回転数：' + addCommaEx($('#chakusekiAll').val()) + '\n' +
+				'換金率：' + calcResultAll.kankin + '\n' +
+				'貸玉率：' + calcResultAll.kashidama + '\n' +
+				'\n' +
+				'遊技履歴\n' +
+				calcResultAll.playHistoryConStr +
+				'\n期待値\n' +
+				'■持玉率100%\n' +
+				'1,800/' + addCommaEx(roundEx(calcKitaichi(1800, 100, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,000/' + addCommaEx(roundEx(calcKitaichi(2000, 100, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,200/' + addCommaEx(roundEx(calcKitaichi(2200, 100, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,400/' + addCommaEx(roundEx(calcKitaichi(2400, 100, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,600/' + addCommaEx(roundEx(calcKitaichi(2600, 100, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,800/' + addCommaEx(roundEx(calcKitaichi(2800, 100, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'\n' +
+				'■持玉率95%\n' +
+				'1,800/' + addCommaEx(roundEx(calcKitaichi(1800, 95, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,000/' + addCommaEx(roundEx(calcKitaichi(2000, 95, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,200/' + addCommaEx(roundEx(calcKitaichi(2200, 95, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,400/' + addCommaEx(roundEx(calcKitaichi(2400, 95, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,600/' + addCommaEx(roundEx(calcKitaichi(2600, 95, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,800/' + addCommaEx(roundEx(calcKitaichi(2800, 95, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'\n' +
+				'■持玉率90%：\n' +
+				'1,800/' + addCommaEx(roundEx(calcKitaichi(1800, 90, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,000/' + addCommaEx(roundEx(calcKitaichi(2000, 90, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,200/' + addCommaEx(roundEx(calcKitaichi(2200, 90, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,400/' + addCommaEx(roundEx(calcKitaichi(2400, 90, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,600/' + addCommaEx(roundEx(calcKitaichi(2600, 90, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,800/' + addCommaEx(roundEx(calcKitaichi(2800, 90, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'\n' +
+				'■持玉率85%：\n' +
+				'1,800/' + addCommaEx(roundEx(calcKitaichi(1800, 85, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,000/' + addCommaEx(roundEx(calcKitaichi(2000, 85, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,200/' + addCommaEx(roundEx(calcKitaichi(2200, 85, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,400/' + addCommaEx(roundEx(calcKitaichi(2400, 85, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,600/' + addCommaEx(roundEx(calcKitaichi(2600, 85, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,800/' + addCommaEx(roundEx(calcKitaichi(2800, 85, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'\n' +
+				'■持玉率80%：\n' +
+				'1,800/' + addCommaEx(roundEx(calcKitaichi(1800, 80, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,000/' + addCommaEx(roundEx(calcKitaichi(2000, 80, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,200/' + addCommaEx(roundEx(calcKitaichi(2200, 80, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,400/' + addCommaEx(roundEx(calcKitaichi(2400, 80, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,600/' + addCommaEx(roundEx(calcKitaichi(2600, 80, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,800/' + addCommaEx(roundEx(calcKitaichi(2800, 80, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'\n' +
+				'■持玉率75%：\n' +
+				'1,800/' + addCommaEx(roundEx(calcKitaichi(1800, 75, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,000/' + addCommaEx(roundEx(calcKitaichi(2000, 75, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,200/' + addCommaEx(roundEx(calcKitaichi(2200, 75, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,400/' + addCommaEx(roundEx(calcKitaichi(2400, 75, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,600/' + addCommaEx(roundEx(calcKitaichi(2600, 75, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,800/' + addCommaEx(roundEx(calcKitaichi(2800, 75, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'\n' +
+				'■持玉率70%：\n' +
+				'1,800/' + addCommaEx(roundEx(calcKitaichi(1800, 70, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,000/' + addCommaEx(roundEx(calcKitaichi(2000, 70, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,200/' + addCommaEx(roundEx(calcKitaichi(2200, 70, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,400/' + addCommaEx(roundEx(calcKitaichi(2400, 70, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,600/' + addCommaEx(roundEx(calcKitaichi(2600, 70, calcResultAll, kishuInfo), 0)) + '円\n' +
+				'2,800/' + addCommaEx(roundEx(calcKitaichi(2800, 70, calcResultAll, kishuInfo), 0)) + '円'
+			);
+
+			$("#jissekiResult").show();
+			$("#result").focus();
+			saveValueToStrage();
+		});
+
+		$(".hide").click(function() {
+			$("#jissekiResult").hide();
+		});
+
+		$("#jissekiResult")
+			.focus(function() {
+				$("#result").select();
+			})
+			.click(function() {
+				$("#result").select();
+				return false;
+		});
+
+	});
+</script>
+
+</head>
+<body>
+
+<form action="" method="post">
+<input type="hidden" name="dispMaxNo" id="dispMaxNo">
+<!-- ヘッダここから -->
+<header>
+<div id="head">
+
+	<h1>
+		<span></span>
+		<a href="https://yahoo.co.jp">パチンコ期待値.com~yahooに飛ぶようにしてる~</a>
+		<!-- 機種番号：<span id="kishuID"></span> <span id="kishuName"></span> -->
+	</h1>
+	<!--<a href="メールアドレスやRSSなどのURLを入れてください。アイコンも変更可能です。" class="left_link"><img src="img/icon1.jpg" alt=""></a>-->
+
+</div>
+</header>
+<!-- /ヘッダここまで -->
+
+<div id="contents">
+<!-- 更新履歴やTOPICSここから -->
+<!--
+<div id="news">
+	<ul>
+		<li>201x/xx/xx パチンコ期待値.comオープンしました！</li>
+		<li><a href="">最終更新履歴やTOPICSなどを入力してください。</a></li>
+	</ul>
+</div>
+-->
+<!-- /更新履歴やTOPICSここまで -->
+
+
+<!-- 説明文ここから -->
+<!--
+<p class="desc">「パチンコ期待値.com」は、パチンコ台の期待値を計算します。
+</p>
+-->
+<!-- /説明文ここまで -->
+
+<!-- 広告ここから -->
+<!--
+<div class="ad">
+	<img src="img/sample_banner.jpg" width="320" height="50" alt="">
+</div>
+-->
+<!-- /広告ここまで -->
+
+<!-- パンくずここから -->
+<div id="pan">
+	<a href="https://yahoo.co.jp">TOP</a> &gt; <a href="https://yahoo.co.jp">実績入力／計算</a> &gt; 機種番号：<span id="kishuID"></span> <span id="kishuName"></span>
+</div>
+<!-- /パンくずここまで -->
+
+
+<!-- 記事内容ここから -->
+<article>
+<div id="atariInfo">
+</div>
+<div id="jissekiInputOuter">
+	<div class="jissekiInputButton">
+		<input type="button" class="saveTemp" name="saveTemp" value="一時保存">
+		<input type="button" class="clear" name="clear" value="クリア">
+		<input type="button" class="hide" name="hide" value="結果非表示">
+		<input type="button" class="calc" name="calc" value="結果表示">
+	</div>
+	<div id="jissekiInput">
+		<label for="zantama_command" class="label">残玉</label><textarea id="zantama_command" name="zantama_command" class="jissekiInput" rows="1"></textarea><br>
+		<label for="toushi_command" class="label">現金投資</label><textarea id="toushi_command" name="toushi_command" class="jissekiInput" rows="1"></textarea><br>
+		<label for="mochikomi_command" class="label">持込玉</label><textarea id="mochikomi_command" name="mochikomi_command" class="jissekiInput" rows="1"></textarea><br>
+		<label for="mochidashi_command" class="label">持出玉</label><textarea id="mochidashi_command" name="mochidashi_command" class="jissekiInput" rows="1"></textarea><br>
+		<label for="dedamachikan" class="label">出玉置換</label><input type="text" pattern="[0-9]?(\.[0-9]?)?" id="dedamachikan" name="dedamachikan" class="jissekiInput sixDigits" maxlength="6">
+			&nbsp;標準：<span id="default1R"></span><br>
+		<label for="kashidama" class="label">貸玉率</label><input type="text" pattern="[0-9]?(\.[0-9]?)?" id="kashidama"
+		                                                               name="kashidama" class="jissekiInput sixDigits" maxlength="100">
+		<label for="kankin">換金率</label><input type="text" pattern="[0-9]?(\.[0-9]?)?" id="kankin" name="kankin" class="jissekiInput fiveDigits" maxlength="100"><br>
+		<label for="chakusekiAll">着席時総回転数</label><input type="number" pattern="[0-9]*" id="chakusekiAll" name="chakusekiAll" class="jissekiInput thirteenDigits" maxlength="100">
+		<table id="history">
+			<!--<caption>遊戯履歴</caption>-->
+			<thead>
+				<tr>
+					<th>No</th>
+					<th>通常</th>
+					<th>電ｻﾎﾟ</th>
+					<th>当番号</th>
+					<th>増減</th>
+					<th>ｻﾎﾟ抜</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr id="tr1">
+					<td class="td1">1</td>
+					<td class="td2"><input type="text" id="td1_2" name="td1_2" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row1"></td>
+					<td class="td3"><input type="number" id="td1_3" name="td1_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row1"></td>
+					<td class="td4"><input type="number" id="td1_4" name="td1_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row1"></td>
+					<td class="td5"><input type="text" id="td1_5" name="td1_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row1"></td>
+					<td class="td6"><input type="number" id="td1_6" name="td1_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row1"></td>
+				</tr>
+				<tr id="tr2">
+					<td class="td1">2</td>
+					<td class="td2"><input type="number" id="td2_2" name="td2_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row2"></td>
+					<td class="td3"><input type="number" id="td2_3" name="td2_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row2"></td>
+					<td class="td4"><input type="number" id="td2_4" name="td2_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row2"></td>
+					<td class="td5"><input type="text" id="td2_5" name="td2_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row2"></td>
+					<td class="td6"><input type="number" id="td2_6" name="td2_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row2"></td>
+				</tr>
+				<tr id="tr3">
+					<td class="td1">3</td>
+					<td class="td2"><input type="number" id="td3_2" name="td3_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row3"></td>
+					<td class="td3"><input type="number" id="td3_3" name="td3_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row3"></td>
+					<td class="td4"><input type="number" id="td3_4" name="td3_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row3"></td>
+					<td class="td5"><input type="text" id="td3_5" name="td3_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row3"></td>
+					<td class="td6"><input type="number" id="td3_6" name="td3_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row3"></td>
+				</tr>
+				<tr id="tr4">
+					<td class="td1">4</td>
+					<td class="td2"><input type="number" id="td4_2" name="td4_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row4"></td>
+					<td class="td3"><input type="number" id="td4_3" name="td4_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row4"></td>
+					<td class="td4"><input type="number" id="td4_4" name="td4_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row4"></td>
+					<td class="td5"><input type="text" id="td4_5" name="td4_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row4"></td>
+					<td class="td6"><input type="number" id="td4_6" name="td4_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row4"></td>
+				</tr>
+				<tr id="tr5">
+					<td class="td1">5</td>
+					<td class="td2"><input type="number" id="td5_2" name="td5_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row5"></td>
+					<td class="td3"><input type="number" id="td5_3" name="td5_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row5"></td>
+					<td class="td4"><input type="number" id="td5_4" name="td5_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row5"></td>
+					<td class="td5"><input type="text" id="td5_5" name="td5_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row5"></td>
+					<td class="td6"><input type="number" id="td5_6" name="td5_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row5"></td>
+				</tr>
+				<tr id="tr6">
+					<td class="td1">6</td>
+					<td class="td2"><input type="number" id="td6_2" name="td6_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row6"></td>
+					<td class="td3"><input type="number" id="td6_3" name="td6_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row6"></td>
+					<td class="td4"><input type="number" id="td6_4" name="td6_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row6"></td>
+					<td class="td5"><input type="text" id="td6_5" name="td6_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row6"></td>
+					<td class="td6"><input type="number" id="td6_6" name="td6_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row6"></td>
+				</tr>
+				<tr id="tr7">
+					<td class="td1">7</td>
+					<td class="td2"><input type="number" id="td7_2" name="td7_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row7"></td>
+					<td class="td3"><input type="number" id="td7_3" name="td7_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row7"></td>
+					<td class="td4"><input type="number" id="td7_4" name="td7_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row7"></td>
+					<td class="td5"><input type="text" id="td7_5" name="td7_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row7"></td>
+					<td class="td6"><input type="number" id="td7_6" name="td7_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row7"></td>
+				</tr>
+				<tr id="tr8">
+					<td class="td1">8</td>
+					<td class="td2"><input type="number" id="td8_2" name="td8_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row8"></td>
+					<td class="td3"><input type="number" id="td8_3" name="td8_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row8"></td>
+					<td class="td4"><input type="number" id="td8_4" name="td8_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row8"></td>
+					<td class="td5"><input type="text" id="td8_5" name="td8_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row8"></td>
+					<td class="td6"><input type="number" id="td8_6" name="td8_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row8"></td>
+				</tr>
+				<tr id="tr9">
+					<td class="td1">9</td>
+					<td class="td2"><input type="number" id="td9_2" name="td9_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row9"></td>
+					<td class="td3"><input type="number" id="td9_3" name="td9_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row9"></td>
+					<td class="td4"><input type="number" id="td9_4" name="td9_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row9"></td>
+					<td class="td5"><input type="text" id="td9_5" name="td9_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row9"></td>
+					<td class="td6"><input type="number" id="td9_6" name="td9_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row9"></td>
+				</tr>
+				<tr id="tr10">
+					<td class="td1">10</td>
+					<td class="td2"><input type="number" id="td10_2" name="td10_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row10"></td>
+					<td class="td3"><input type="number" id="td10_3" name="td10_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row10"></td>
+					<td class="td4"><input type="number" id="td10_4" name="td10_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row10"></td>
+					<td class="td5"><input type="text" id="td10_5" name="td10_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row10"></td>
+					<td class="td6"><input type="number" id="td10_6" name="td10_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row10"></td>
+				</tr>
+				<tr id="tr11">
+					<td class="td1">11</td>
+					<td class="td2"><input type="number" id="td11_2" name="td11_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row11"></td>
+					<td class="td3"><input type="number" id="td11_3" name="td11_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row11"></td>
+					<td class="td4"><input type="number" id="td11_4" name="td11_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row11"></td>
+					<td class="td5"><input type="text" id="td11_5" name="td11_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row11"></td>
+					<td class="td6"><input type="number" id="td11_6" name="td11_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row11"></td>
+				</tr>
+				<tr id="tr12">
+					<td class="td1">12</td>
+					<td class="td2"><input type="number" id="td12_2" name="td12_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row12"></td>
+					<td class="td3"><input type="number" id="td12_3" name="td12_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row12"></td>
+					<td class="td4"><input type="number" id="td12_4" name="td12_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row12"></td>
+					<td class="td5"><input type="text" id="td12_5" name="td12_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row12"></td>
+					<td class="td6"><input type="number" id="td12_6" name="td12_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row12"></td>
+				</tr>
+				<tr id="tr13">
+					<td class="td1">13</td>
+					<td class="td2"><input type="number" id="td13_2" name="td13_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row13"></td>
+					<td class="td3"><input type="number" id="td13_3" name="td13_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row13"></td>
+					<td class="td4"><input type="number" id="td13_4" name="td13_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row13"></td>
+					<td class="td5"><input type="text" id="td13_5" name="td13_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row13"></td>
+					<td class="td6"><input type="number" id="td13_6" name="td13_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row13"></td>
+				</tr>
+				<tr id="tr14">
+					<td class="td1">14</td>
+					<td class="td2"><input type="number" id="td14_2" name="td14_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row14"></td>
+					<td class="td3"><input type="number" id="td14_3" name="td14_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row14"></td>
+					<td class="td4"><input type="number" id="td14_4" name="td14_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row14"></td>
+					<td class="td5"><input type="text" id="td14_5" name="td14_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row14"></td>
+					<td class="td6"><input type="number" id="td14_6" name="td14_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row14"></td>
+				</tr>
+				<tr id="tr15">
+					<td class="td1">15</td>
+					<td class="td2"><input type="number" id="td15_2" name="td15_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row15"></td>
+					<td class="td3"><input type="number" id="td15_3" name="td15_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row15"></td>
+					<td class="td4"><input type="number" id="td15_4" name="td15_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row15"></td>
+					<td class="td5"><input type="text" id="td15_5" name="td15_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row15"></td>
+					<td class="td6"><input type="number" id="td15_6" name="td15_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row15"></td>
+				</tr>
+				<tr id="tr16">
+					<td class="td1">16</td>
+					<td class="td2"><input type="number" id="td16_2" name="td16_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row16"></td>
+					<td class="td3"><input type="number" id="td16_3" name="td16_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row16"></td>
+					<td class="td4"><input type="number" id="td16_4" name="td16_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row16"></td>
+					<td class="td5"><input type="text" id="td16_5" name="td16_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row16"></td>
+					<td class="td6"><input type="number" id="td16_6" name="td16_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row16"></td>
+				</tr>
+				<tr id="tr17">
+					<td class="td1">17</td>
+					<td class="td2"><input type="number" id="td17_2" name="td17_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row17"></td>
+					<td class="td3"><input type="number" id="td17_3" name="td17_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row17"></td>
+					<td class="td4"><input type="number" id="td17_4" name="td17_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row17"></td>
+					<td class="td5"><input type="text" id="td17_5" name="td17_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row17"></td>
+					<td class="td6"><input type="number" id="td17_6" name="td17_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row17"></td>
+				</tr>
+				<tr id="tr18">
+					<td class="td1">18</td>
+					<td class="td2"><input type="number" id="td18_2" name="td18_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row18"></td>
+					<td class="td3"><input type="number" id="td18_3" name="td18_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row18"></td>
+					<td class="td4"><input type="number" id="td18_4" name="td18_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row18"></td>
+					<td class="td5"><input type="text" id="td18_5" name="td18_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row18"></td>
+					<td class="td6"><input type="number" id="td18_6" name="td18_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row18"></td>
+				</tr>
+				<tr id="tr19">
+					<td class="td1">19</td>
+					<td class="td2"><input type="number" id="td19_2" name="td19_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row19"></td>
+					<td class="td3"><input type="number" id="td19_3" name="td19_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row19"></td>
+					<td class="td4"><input type="number" id="td19_4" name="td19_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row19"></td>
+					<td class="td5"><input type="text" id="td19_5" name="td19_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row19"></td>
+					<td class="td6"><input type="number" id="td19_6" name="td19_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row19"></td>
+				</tr>
+				<tr id="tr20">
+					<td class="td1">20</td>
+					<td class="td2"><input type="number" id="td20_2" name="td20_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row20"></td>
+					<td class="td3"><input type="number" id="td20_3" name="td20_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row20"></td>
+					<td class="td4"><input type="number" id="td20_4" name="td20_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row20"></td>
+					<td class="td5"><input type="text" id="td20_5" name="td20_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row20"></td>
+					<td class="td6"><input type="number" id="td20_6" name="td20_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row20"></td>
+				</tr>
+				<tr id="tr21">
+					<td class="td1">21</td>
+					<td class="td2"><input type="number" id="td21_2" name="td21_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row21"></td>
+					<td class="td3"><input type="number" id="td21_3" name="td21_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row21"></td>
+					<td class="td4"><input type="number" id="td21_4" name="td21_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row21"></td>
+					<td class="td5"><input type="text" id="td21_5" name="td21_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row21"></td>
+					<td class="td6"><input type="number" id="td21_6" name="td21_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row21"></td>
+				</tr>
+				<tr id="tr22">
+					<td class="td1">22</td>
+					<td class="td2"><input type="number" id="td22_2" name="td22_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row22"></td>
+					<td class="td3"><input type="number" id="td22_3" name="td22_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row22"></td>
+					<td class="td4"><input type="number" id="td22_4" name="td22_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row22"></td>
+					<td class="td5"><input type="text" id="td22_5" name="td22_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row22"></td>
+					<td class="td6"><input type="number" id="td22_6" name="td22_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row22"></td>
+				</tr>
+				<tr id="tr23">
+					<td class="td1">23</td>
+					<td class="td2"><input type="number" id="td23_2" name="td23_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row23"></td>
+					<td class="td3"><input type="number" id="td23_3" name="td23_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row23"></td>
+					<td class="td4"><input type="number" id="td23_4" name="td23_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row23"></td>
+					<td class="td5"><input type="text" id="td23_5" name="td23_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row23"></td>
+					<td class="td6"><input type="number" id="td23_6" name="td23_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row23"></td>
+				</tr>
+				<tr id="tr24">
+					<td class="td1">24</td>
+					<td class="td2"><input type="number" id="td24_2" name="td24_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row24"></td>
+					<td class="td3"><input type="number" id="td24_3" name="td24_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row24"></td>
+					<td class="td4"><input type="number" id="td24_4" name="td24_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row24"></td>
+					<td class="td5"><input type="text" id="td24_5" name="td24_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row24"></td>
+					<td class="td6"><input type="number" id="td24_6" name="td24_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row24"></td>
+				</tr>
+				<tr id="tr25">
+					<td class="td1">25</td>
+					<td class="td2"><input type="number" id="td25_2" name="td25_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row25"></td>
+					<td class="td3"><input type="number" id="td25_3" name="td25_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row25"></td>
+					<td class="td4"><input type="number" id="td25_4" name="td25_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row25"></td>
+					<td class="td5"><input type="text" id="td25_5" name="td25_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row25"></td>
+					<td class="td6"><input type="number" id="td25_6" name="td25_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row25"></td>
+				</tr>
+				<tr id="tr26">
+					<td class="td1">26</td>
+					<td class="td2"><input type="number" id="td26_2" name="td26_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row26"></td>
+					<td class="td3"><input type="number" id="td26_3" name="td26_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row26"></td>
+					<td class="td4"><input type="number" id="td26_4" name="td26_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row26"></td>
+					<td class="td5"><input type="text" id="td26_5" name="td26_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row26"></td>
+					<td class="td6"><input type="number" id="td26_6" name="td26_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row26"></td>
+				</tr>
+				<tr id="tr27">
+					<td class="td1">27</td>
+					<td class="td2"><input type="number" id="td27_2" name="td27_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row27"></td>
+					<td class="td3"><input type="number" id="td27_3" name="td27_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row27"></td>
+					<td class="td4"><input type="number" id="td27_4" name="td27_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row27"></td>
+					<td class="td5"><input type="text" id="td27_5" name="td27_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row27"></td>
+					<td class="td6"><input type="number" id="td27_6" name="td27_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row27"></td>
+				</tr>
+				<tr id="tr28">
+					<td class="td1">28</td>
+					<td class="td2"><input type="number" id="td28_2" name="td28_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row28"></td>
+					<td class="td3"><input type="number" id="td28_3" name="td28_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row28"></td>
+					<td class="td4"><input type="number" id="td28_4" name="td28_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row28"></td>
+					<td class="td5"><input type="text" id="td28_5" name="td28_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row28"></td>
+					<td class="td6"><input type="number" id="td28_6" name="td28_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row28"></td>
+				</tr>
+				<tr id="tr29">
+					<td class="td1">29</td>
+					<td class="td2"><input type="number" id="td29_2" name="td29_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row29"></td>
+					<td class="td3"><input type="number" id="td29_3" name="td29_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row29"></td>
+					<td class="td4"><input type="number" id="td29_4" name="td29_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row29"></td>
+					<td class="td5"><input type="text" id="td29_5" name="td29_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row29"></td>
+					<td class="td6"><input type="number" id="td29_6" name="td29_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row29"></td>
+				</tr>
+				<tr id="tr30">
+					<td class="td1">30</td>
+					<td class="td2"><input type="number" id="td30_2" name="td30_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row30"></td>
+					<td class="td3"><input type="number" id="td30_3" name="td30_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row30"></td>
+					<td class="td4"><input type="number" id="td30_4" name="td30_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row30"></td>
+					<td class="td5"><input type="text" id="td30_5" name="td30_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row30"></td>
+					<td class="td6"><input type="number" id="td30_6" name="td30_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row30"></td>
+				</tr>
+				<tr id="tr31">
+					<td class="td1">31</td>
+					<td class="td2"><input type="number" id="td31_2" name="td31_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row31"></td>
+					<td class="td3"><input type="number" id="td31_3" name="td31_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row31"></td>
+					<td class="td4"><input type="number" id="td31_4" name="td31_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row31"></td>
+					<td class="td5"><input type="text" id="td31_5" name="td31_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row31"></td>
+					<td class="td6"><input type="number" id="td31_6" name="td31_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row31"></td>
+				</tr>
+				<tr id="tr32">
+					<td class="td1">32</td>
+					<td class="td2"><input type="number" id="td32_2" name="td32_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row32"></td>
+					<td class="td3"><input type="number" id="td32_3" name="td32_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row32"></td>
+					<td class="td4"><input type="number" id="td32_4" name="td32_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row32"></td>
+					<td class="td5"><input type="text" id="td32_5" name="td32_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row32"></td>
+					<td class="td6"><input type="number" id="td32_6" name="td32_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row32"></td>
+				</tr>
+				<tr id="tr33">
+					<td class="td1">33</td>
+					<td class="td2"><input type="number" id="td33_2" name="td33_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row33"></td>
+					<td class="td3"><input type="number" id="td33_3" name="td33_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row33"></td>
+					<td class="td4"><input type="number" id="td33_4" name="td33_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row33"></td>
+					<td class="td5"><input type="text" id="td33_5" name="td33_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row33"></td>
+					<td class="td6"><input type="number" id="td33_6" name="td33_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row33"></td>
+				</tr>
+				<tr id="tr34">
+					<td class="td1">34</td>
+					<td class="td2"><input type="number" id="td34_2" name="td34_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row34"></td>
+					<td class="td3"><input type="number" id="td34_3" name="td34_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row34"></td>
+					<td class="td4"><input type="number" id="td34_4" name="td34_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row34"></td>
+					<td class="td5"><input type="text" id="td34_5" name="td34_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row34"></td>
+					<td class="td6"><input type="number" id="td34_6" name="td34_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row34"></td>
+				</tr>
+				<tr id="tr35">
+					<td class="td1">35</td>
+					<td class="td2"><input type="number" id="td35_2" name="td35_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row35"></td>
+					<td class="td3"><input type="number" id="td35_3" name="td35_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row35"></td>
+					<td class="td4"><input type="number" id="td35_4" name="td35_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row35"></td>
+					<td class="td5"><input type="text" id="td35_5" name="td35_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row35"></td>
+					<td class="td6"><input type="number" id="td35_6" name="td35_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row35"></td>
+				</tr>
+				<tr id="tr36">
+					<td class="td1">36</td>
+					<td class="td2"><input type="number" id="td36_2" name="td36_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row36"></td>
+					<td class="td3"><input type="number" id="td36_3" name="td36_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row36"></td>
+					<td class="td4"><input type="number" id="td36_4" name="td36_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row36"></td>
+					<td class="td5"><input type="text" id="td36_5" name="td36_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row36"></td>
+					<td class="td6"><input type="number" id="td36_6" name="td36_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row36"></td>
+				</tr>
+				<tr id="tr37">
+					<td class="td1">37</td>
+					<td class="td2"><input type="number" id="td37_2" name="td37_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row37"></td>
+					<td class="td3"><input type="number" id="td37_3" name="td37_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row37"></td>
+					<td class="td4"><input type="number" id="td37_4" name="td37_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row37"></td>
+					<td class="td5"><input type="text" id="td37_5" name="td37_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row37"></td>
+					<td class="td6"><input type="number" id="td37_6" name="td37_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row37"></td>
+				</tr>
+				<tr id="tr38">
+					<td class="td1">38</td>
+					<td class="td2"><input type="number" id="td38_2" name="td38_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row38"></td>
+					<td class="td3"><input type="number" id="td38_3" name="td38_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row38"></td>
+					<td class="td4"><input type="number" id="td38_4" name="td38_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row38"></td>
+					<td class="td5"><input type="text" id="td38_5" name="td38_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row38"></td>
+					<td class="td6"><input type="number" id="td38_6" name="td38_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row38"></td>
+				</tr>
+				<tr id="tr39">
+					<td class="td1">39</td>
+					<td class="td2"><input type="number" id="td39_2" name="td39_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row39"></td>
+					<td class="td3"><input type="number" id="td39_3" name="td39_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row39"></td>
+					<td class="td4"><input type="number" id="td39_4" name="td39_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row39"></td>
+					<td class="td5"><input type="text" id="td39_5" name="td39_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row39"></td>
+					<td class="td6"><input type="number" id="td39_6" name="td39_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row39"></td>
+				</tr>
+				<tr id="tr40">
+					<td class="td1">40</td>
+					<td class="td2"><input type="number" id="td40_2" name="td40_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row40"></td>
+					<td class="td3"><input type="number" id="td40_3" name="td40_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row40"></td>
+					<td class="td4"><input type="number" id="td40_4" name="td40_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row40"></td>
+					<td class="td5"><input type="text" id="td40_5" name="td40_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row40"></td>
+					<td class="td6"><input type="number" id="td40_6" name="td40_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row40"></td>
+				</tr>
+				<tr id="tr41">
+					<td class="td1">41</td>
+					<td class="td2"><input type="number" id="td41_2" name="td41_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row41"></td>
+					<td class="td3"><input type="number" id="td41_3" name="td41_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row41"></td>
+					<td class="td4"><input type="number" id="td41_4" name="td41_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row41"></td>
+					<td class="td5"><input type="text" id="td41_5" name="td41_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row41"></td>
+					<td class="td6"><input type="number" id="td41_6" name="td41_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row41"></td>
+				</tr>
+				<tr id="tr42">
+					<td class="td1">42</td>
+					<td class="td2"><input type="number" id="td42_2" name="td42_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row42"></td>
+					<td class="td3"><input type="number" id="td42_3" name="td42_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row42"></td>
+					<td class="td4"><input type="number" id="td42_4" name="td42_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row42"></td>
+					<td class="td5"><input type="text" id="td42_5" name="td42_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row42"></td>
+					<td class="td6"><input type="number" id="td42_6" name="td42_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row42"></td>
+				</tr>
+				<tr id="tr43">
+					<td class="td1">43</td>
+					<td class="td2"><input type="number" id="td43_2" name="td43_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row43"></td>
+					<td class="td3"><input type="number" id="td43_3" name="td43_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row43"></td>
+					<td class="td4"><input type="number" id="td43_4" name="td43_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row43"></td>
+					<td class="td5"><input type="text" id="td43_5" name="td43_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row43"></td>
+					<td class="td6"><input type="number" id="td43_6" name="td43_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row43"></td>
+				</tr>
+				<tr id="tr44">
+					<td class="td1">44</td>
+					<td class="td2"><input type="number" id="td44_2" name="td44_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row44"></td>
+					<td class="td3"><input type="number" id="td44_3" name="td44_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row44"></td>
+					<td class="td4"><input type="number" id="td44_4" name="td44_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row44"></td>
+					<td class="td5"><input type="text" id="td44_5" name="td44_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row44"></td>
+					<td class="td6"><input type="number" id="td44_6" name="td44_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row44"></td>
+				</tr>
+				<tr id="tr45">
+					<td class="td1">45</td>
+					<td class="td2"><input type="number" id="td45_2" name="td45_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row45"></td>
+					<td class="td3"><input type="number" id="td45_3" name="td45_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row45"></td>
+					<td class="td4"><input type="number" id="td45_4" name="td45_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row45"></td>
+					<td class="td5"><input type="text" id="td45_5" name="td45_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row45"></td>
+					<td class="td6"><input type="number" id="td45_6" name="td45_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row45"></td>
+				</tr>
+				<tr id="tr46">
+					<td class="td1">46</td>
+					<td class="td2"><input type="number" id="td46_2" name="td46_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row46"></td>
+					<td class="td3"><input type="number" id="td46_3" name="td46_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row46"></td>
+					<td class="td4"><input type="number" id="td46_4" name="td46_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row46"></td>
+					<td class="td5"><input type="text" id="td46_5" name="td46_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row46"></td>
+					<td class="td6"><input type="number" id="td46_6" name="td46_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row46"></td>
+				</tr>
+				<tr id="tr47">
+					<td class="td1">47</td>
+					<td class="td2"><input type="number" id="td47_2" name="td47_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row47"></td>
+					<td class="td3"><input type="number" id="td47_3" name="td47_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row47"></td>
+					<td class="td4"><input type="number" id="td47_4" name="td47_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row47"></td>
+					<td class="td5"><input type="text" id="td47_5" name="td47_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row47"></td>
+					<td class="td6"><input type="number" id="td47_6" name="td47_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row47"></td>
+				</tr>
+				<tr id="tr48">
+					<td class="td1">48</td>
+					<td class="td2"><input type="number" id="td48_2" name="td48_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row48"></td>
+					<td class="td3"><input type="number" id="td48_3" name="td48_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row48"></td>
+					<td class="td4"><input type="number" id="td48_4" name="td48_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row48"></td>
+					<td class="td5"><input type="text" id="td48_5" name="td48_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row48"></td>
+					<td class="td6"><input type="number" id="td48_6" name="td48_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row48"></td>
+				</tr>
+				<tr id="tr49">
+					<td class="td1">49</td>
+					<td class="td2"><input type="number" id="td49_2" name="td49_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row49"></td>
+					<td class="td3"><input type="number" id="td49_3" name="td49_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row49"></td>
+					<td class="td4"><input type="number" id="td49_4" name="td49_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row49"></td>
+					<td class="td5"><input type="text" id="td49_5" name="td49_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row49"></td>
+					<td class="td6"><input type="number" id="td49_6" name="td49_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row49"></td>
+				</tr>
+				<tr id="tr50">
+					<td class="td1">50</td>
+					<td class="td2"><input type="number" id="td50_2" name="td50_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row50"></td>
+					<td class="td3"><input type="number" id="td50_3" name="td50_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row50"></td>
+					<td class="td4"><input type="number" id="td50_4" name="td50_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row50"></td>
+					<td class="td5"><input type="text" id="td50_5" name="td50_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row50"></td>
+					<td class="td6"><input type="number" id="td50_6" name="td50_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row50"></td>
+				</tr>
+				<tr id="tr51">
+					<td class="td1">51</td>
+					<td class="td2"><input type="number" id="td51_2" name="td51_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row51"></td>
+					<td class="td3"><input type="number" id="td51_3" name="td51_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row51"></td>
+					<td class="td4"><input type="number" id="td51_4" name="td51_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row51"></td>
+					<td class="td5"><input type="text" id="td51_5" name="td51_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row51"></td>
+					<td class="td6"><input type="number" id="td51_6" name="td51_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row51"></td>
+				</tr>
+				<tr id="tr52">
+					<td class="td1">52</td>
+					<td class="td2"><input type="number" id="td52_2" name="td52_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row52"></td>
+					<td class="td3"><input type="number" id="td52_3" name="td52_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row52"></td>
+					<td class="td4"><input type="number" id="td52_4" name="td52_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row52"></td>
+					<td class="td5"><input type="text" id="td52_5" name="td52_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row52"></td>
+					<td class="td6"><input type="number" id="td52_6" name="td52_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row52"></td>
+				</tr>
+				<tr id="tr53">
+					<td class="td1">53</td>
+					<td class="td2"><input type="number" id="td53_2" name="td53_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row53"></td>
+					<td class="td3"><input type="number" id="td53_3" name="td53_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row53"></td>
+					<td class="td4"><input type="number" id="td53_4" name="td53_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row53"></td>
+					<td class="td5"><input type="text" id="td53_5" name="td53_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row53"></td>
+					<td class="td6"><input type="number" id="td53_6" name="td53_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row53"></td>
+				</tr>
+				<tr id="tr54">
+					<td class="td1">54</td>
+					<td class="td2"><input type="number" id="td54_2" name="td54_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row54"></td>
+					<td class="td3"><input type="number" id="td54_3" name="td54_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row54"></td>
+					<td class="td4"><input type="number" id="td54_4" name="td54_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row54"></td>
+					<td class="td5"><input type="text" id="td54_5" name="td54_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row54"></td>
+					<td class="td6"><input type="number" id="td54_6" name="td54_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row54"></td>
+				</tr>
+				<tr id="tr55">
+					<td class="td1">55</td>
+					<td class="td2"><input type="number" id="td55_2" name="td55_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row55"></td>
+					<td class="td3"><input type="number" id="td55_3" name="td55_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row55"></td>
+					<td class="td4"><input type="number" id="td55_4" name="td55_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row55"></td>
+					<td class="td5"><input type="text" id="td55_5" name="td55_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row55"></td>
+					<td class="td6"><input type="number" id="td55_6" name="td55_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row55"></td>
+				</tr>
+				<tr id="tr56">
+					<td class="td1">56</td>
+					<td class="td2"><input type="number" id="td56_2" name="td56_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row56"></td>
+					<td class="td3"><input type="number" id="td56_3" name="td56_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row56"></td>
+					<td class="td4"><input type="number" id="td56_4" name="td56_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row56"></td>
+					<td class="td5"><input type="text" id="td56_5" name="td56_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row56"></td>
+					<td class="td6"><input type="number" id="td56_6" name="td56_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row56"></td>
+				</tr>
+				<tr id="tr57">
+					<td class="td1">57</td>
+					<td class="td2"><input type="number" id="td57_2" name="td57_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row57"></td>
+					<td class="td3"><input type="number" id="td57_3" name="td57_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row57"></td>
+					<td class="td4"><input type="number" id="td57_4" name="td57_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row57"></td>
+					<td class="td5"><input type="text" id="td57_5" name="td57_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row57"></td>
+					<td class="td6"><input type="number" id="td57_6" name="td57_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row57"></td>
+				</tr>
+				<tr id="tr58">
+					<td class="td1">58</td>
+					<td class="td2"><input type="number" id="td58_2" name="td58_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row58"></td>
+					<td class="td3"><input type="number" id="td58_3" name="td58_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row58"></td>
+					<td class="td4"><input type="number" id="td58_4" name="td58_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row58"></td>
+					<td class="td5"><input type="text" id="td58_5" name="td58_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row58"></td>
+					<td class="td6"><input type="number" id="td58_6" name="td58_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row58"></td>
+				</tr>
+				<tr id="tr59">
+					<td class="td1">59</td>
+					<td class="td2"><input type="number" id="td59_2" name="td59_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row59"></td>
+					<td class="td3"><input type="number" id="td59_3" name="td59_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row59"></td>
+					<td class="td4"><input type="number" id="td59_4" name="td59_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row59"></td>
+					<td class="td5"><input type="text" id="td59_5" name="td59_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row59"></td>
+					<td class="td6"><input type="number" id="td59_6" name="td59_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row59"></td>
+				</tr>
+				<tr id="tr60">
+					<td class="td1">60</td>
+					<td class="td2"><input type="number" id="td60_2" name="td60_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row60"></td>
+					<td class="td3"><input type="number" id="td60_3" name="td60_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row60"></td>
+					<td class="td4"><input type="number" id="td60_4" name="td60_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row60"></td>
+					<td class="td5"><input type="text" id="td60_5" name="td60_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row60"></td>
+					<td class="td6"><input type="number" id="td60_6" name="td60_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row60"></td>
+				</tr>
+				<tr id="tr61">
+					<td class="td1">61</td>
+					<td class="td2"><input type="number" id="td61_2" name="td61_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row61"></td>
+					<td class="td3"><input type="number" id="td61_3" name="td61_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row61"></td>
+					<td class="td4"><input type="number" id="td61_4" name="td61_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row61"></td>
+					<td class="td5"><input type="text" id="td61_5" name="td61_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row61"></td>
+					<td class="td6"><input type="number" id="td61_6" name="td61_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row61"></td>
+				</tr>
+				<tr id="tr62">
+					<td class="td1">62</td>
+					<td class="td2"><input type="number" id="td62_2" name="td62_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row62"></td>
+					<td class="td3"><input type="number" id="td62_3" name="td62_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row62"></td>
+					<td class="td4"><input type="number" id="td62_4" name="td62_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row62"></td>
+					<td class="td5"><input type="text" id="td62_5" name="td62_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row62"></td>
+					<td class="td6"><input type="number" id="td62_6" name="td62_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row62"></td>
+				</tr>
+				<tr id="tr63">
+					<td class="td1">63</td>
+					<td class="td2"><input type="number" id="td63_2" name="td63_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row63"></td>
+					<td class="td3"><input type="number" id="td63_3" name="td63_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row63"></td>
+					<td class="td4"><input type="number" id="td63_4" name="td63_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row63"></td>
+					<td class="td5"><input type="text" id="td63_5" name="td63_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row63"></td>
+					<td class="td6"><input type="number" id="td63_6" name="td63_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row63"></td>
+				</tr>
+				<tr id="tr64">
+					<td class="td1">64</td>
+					<td class="td2"><input type="number" id="td64_2" name="td64_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row64"></td>
+					<td class="td3"><input type="number" id="td64_3" name="td64_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row64"></td>
+					<td class="td4"><input type="number" id="td64_4" name="td64_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row64"></td>
+					<td class="td5"><input type="text" id="td64_5" name="td64_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row64"></td>
+					<td class="td6"><input type="number" id="td64_6" name="td64_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row64"></td>
+				</tr>
+				<tr id="tr65">
+					<td class="td1">65</td>
+					<td class="td2"><input type="number" id="td65_2" name="td65_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row65"></td>
+					<td class="td3"><input type="number" id="td65_3" name="td65_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row65"></td>
+					<td class="td4"><input type="number" id="td65_4" name="td65_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row65"></td>
+					<td class="td5"><input type="text" id="td65_5" name="td65_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row65"></td>
+					<td class="td6"><input type="number" id="td65_6" name="td65_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row65"></td>
+				</tr>
+				<tr id="tr66">
+					<td class="td1">66</td>
+					<td class="td2"><input type="number" id="td66_2" name="td66_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row66"></td>
+					<td class="td3"><input type="number" id="td66_3" name="td66_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row66"></td>
+					<td class="td4"><input type="number" id="td66_4" name="td66_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row66"></td>
+					<td class="td5"><input type="text" id="td66_5" name="td66_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row66"></td>
+					<td class="td6"><input type="number" id="td66_6" name="td66_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row66"></td>
+				</tr>
+				<tr id="tr67">
+					<td class="td1">67</td>
+					<td class="td2"><input type="number" id="td67_2" name="td67_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row67"></td>
+					<td class="td3"><input type="number" id="td67_3" name="td67_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row67"></td>
+					<td class="td4"><input type="number" id="td67_4" name="td67_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row67"></td>
+					<td class="td5"><input type="text" id="td67_5" name="td67_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row67"></td>
+					<td class="td6"><input type="number" id="td67_6" name="td67_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row67"></td>
+				</tr>
+				<tr id="tr68">
+					<td class="td1">68</td>
+					<td class="td2"><input type="number" id="td68_2" name="td68_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row68"></td>
+					<td class="td3"><input type="number" id="td68_3" name="td68_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row68"></td>
+					<td class="td4"><input type="number" id="td68_4" name="td68_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row68"></td>
+					<td class="td5"><input type="text" id="td68_5" name="td68_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row68"></td>
+					<td class="td6"><input type="number" id="td68_6" name="td68_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row68"></td>
+				</tr>
+				<tr id="tr69">
+					<td class="td1">69</td>
+					<td class="td2"><input type="number" id="td69_2" name="td69_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row69"></td>
+					<td class="td3"><input type="number" id="td69_3" name="td69_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row69"></td>
+					<td class="td4"><input type="number" id="td69_4" name="td69_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row69"></td>
+					<td class="td5"><input type="text" id="td69_5" name="td69_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row69"></td>
+					<td class="td6"><input type="number" id="td69_6" name="td69_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row69"></td>
+				</tr>
+				<tr id="tr70">
+					<td class="td1">70</td>
+					<td class="td2"><input type="number" id="td70_2" name="td70_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row70"></td>
+					<td class="td3"><input type="number" id="td70_3" name="td70_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row70"></td>
+					<td class="td4"><input type="number" id="td70_4" name="td70_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row70"></td>
+					<td class="td5"><input type="text" id="td70_5" name="td70_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row70"></td>
+					<td class="td6"><input type="number" id="td70_6" name="td70_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row70"></td>
+				</tr>
+				<tr id="tr71">
+					<td class="td1">71</td>
+					<td class="td2"><input type="number" id="td71_2" name="td71_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row71"></td>
+					<td class="td3"><input type="number" id="td71_3" name="td71_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row71"></td>
+					<td class="td4"><input type="number" id="td71_4" name="td71_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row71"></td>
+					<td class="td5"><input type="text" id="td71_5" name="td71_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row71"></td>
+					<td class="td6"><input type="number" id="td71_6" name="td71_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row71"></td>
+				</tr>
+				<tr id="tr72">
+					<td class="td1">72</td>
+					<td class="td2"><input type="number" id="td72_2" name="td72_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row72"></td>
+					<td class="td3"><input type="number" id="td72_3" name="td72_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row72"></td>
+					<td class="td4"><input type="number" id="td72_4" name="td72_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row72"></td>
+					<td class="td5"><input type="text" id="td72_5" name="td72_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row72"></td>
+					<td class="td6"><input type="number" id="td72_6" name="td72_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row72"></td>
+				</tr>
+				<tr id="tr73">
+					<td class="td1">73</td>
+					<td class="td2"><input type="number" id="td73_2" name="td73_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row73"></td>
+					<td class="td3"><input type="number" id="td73_3" name="td73_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row73"></td>
+					<td class="td4"><input type="number" id="td73_4" name="td73_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row73"></td>
+					<td class="td5"><input type="text" id="td73_5" name="td73_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row73"></td>
+					<td class="td6"><input type="number" id="td73_6" name="td73_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row73"></td>
+				</tr>
+				<tr id="tr74">
+					<td class="td1">74</td>
+					<td class="td2"><input type="number" id="td74_2" name="td74_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row74"></td>
+					<td class="td3"><input type="number" id="td74_3" name="td74_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row74"></td>
+					<td class="td4"><input type="number" id="td74_4" name="td74_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row74"></td>
+					<td class="td5"><input type="text" id="td74_5" name="td74_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row74"></td>
+					<td class="td6"><input type="number" id="td74_6" name="td74_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row74"></td>
+				</tr>
+				<tr id="tr75">
+					<td class="td1">75</td>
+					<td class="td2"><input type="number" id="td75_2" name="td75_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row75"></td>
+					<td class="td3"><input type="number" id="td75_3" name="td75_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row75"></td>
+					<td class="td4"><input type="number" id="td75_4" name="td75_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row75"></td>
+					<td class="td5"><input type="text" id="td75_5" name="td75_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row75"></td>
+					<td class="td6"><input type="number" id="td75_6" name="td75_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row75"></td>
+				</tr>
+				<tr id="tr76">
+					<td class="td1">76</td>
+					<td class="td2"><input type="number" id="td76_2" name="td76_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row76"></td>
+					<td class="td3"><input type="number" id="td76_3" name="td76_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row76"></td>
+					<td class="td4"><input type="number" id="td76_4" name="td76_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row76"></td>
+					<td class="td5"><input type="text" id="td76_5" name="td76_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row76"></td>
+					<td class="td6"><input type="number" id="td76_6" name="td76_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row76"></td>
+				</tr>
+				<tr id="tr77">
+					<td class="td1">77</td>
+					<td class="td2"><input type="number" id="td77_2" name="td77_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row77"></td>
+					<td class="td3"><input type="number" id="td77_3" name="td77_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row77"></td>
+					<td class="td4"><input type="number" id="td77_4" name="td77_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row77"></td>
+					<td class="td5"><input type="text" id="td77_5" name="td77_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row77"></td>
+					<td class="td6"><input type="number" id="td77_6" name="td77_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row77"></td>
+				</tr>
+				<tr id="tr78">
+					<td class="td1">78</td>
+					<td class="td2"><input type="number" id="td78_2" name="td78_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row78"></td>
+					<td class="td3"><input type="number" id="td78_3" name="td78_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row78"></td>
+					<td class="td4"><input type="number" id="td78_4" name="td78_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row78"></td>
+					<td class="td5"><input type="text" id="td78_5" name="td78_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row78"></td>
+					<td class="td6"><input type="number" id="td78_6" name="td78_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row78"></td>
+				</tr>
+				<tr id="tr79">
+					<td class="td1">79</td>
+					<td class="td2"><input type="number" id="td79_2" name="td79_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row79"></td>
+					<td class="td3"><input type="number" id="td79_3" name="td79_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row79"></td>
+					<td class="td4"><input type="number" id="td79_4" name="td79_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row79"></td>
+					<td class="td5"><input type="text" id="td79_5" name="td79_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row79"></td>
+					<td class="td6"><input type="number" id="td79_6" name="td79_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row79"></td>
+				</tr>
+				<tr id="tr80">
+					<td class="td1">80</td>
+					<td class="td2"><input type="number" id="td80_2" name="td80_2" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory tsujo row80"></td>
+					<td class="td3"><input type="number" id="td80_3" name="td80_3" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory densup row80"></td>
+					<td class="td4"><input type="number" id="td80_4" name="td80_4" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory atariNo row80"></td>
+					<td class="td5"><input type="text" id="td80_5" name="td80_5" pattern="-?[0-9]*" class="jissekiInput sixSDigits playHistory plusMinus row80"></td>
+					<td class="td6"><input type="number" id="td80_6" name="td80_6" pattern="[0-9]*" class="jissekiInput sixSDigits playHistory supNuke row80"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div id="jissekiResult">
+		<label for="result" style="vertical-align:top;">計算結果</label><textarea id="result" name="result"></textarea>
+	</div>
+	<div class="jissekiInputButton">
+		<div class="rowControl">
+			<span id="addRow"><img src="img/plus.png" class="rowControl">10行追加</span>&ensp;&ensp;
+			<span id="delRow"><img src="img/minus.png" class="rowControl">10行削除</span>
+		</div>
+		<input type="button" class="calc" name="calc" value="結果表示">
+	</div>
+</div>
+</article>
+<!-- /記事内容ここまで -->
+
+<!-- 何かあれば説明文補足ここから -->
+<!-- /何かあれば説明文補足ここまで -->
+
+
+<!-- フッタここから -->
+<footer>
+
+	<!-- TOPに戻るここから -->
+	<div class="foot_link">
+	<a href="#contents" class="top scroll">▲ TOP</a>
+	</div>
+	<!-- TOPに戻るここまで -->
+
+</footer>
+</div>
+<!-- /フッタここまで -->
+</form>
+</body>
+</html>
+
