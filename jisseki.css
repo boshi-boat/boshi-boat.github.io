@@ -18,8 +18,9 @@ header,footer,nav,section{display:block;}
 
 html{
 	font:14px/1.3 "ヒラギノ角ゴ Pro W3";
-	-webkit-text-size-adjust:100%;}
-
+	-webkit-text-size-adjust:100%;
+	background-image:url("./animal.jpg");
+}
 li{list-style:none;
 }
 
@@ -27,7 +28,9 @@ li{list-style:none;
 	レイアウト
 -----------------------*/
 body{
-	background:#FFF;
+/*	background-image:url("./animal.jpg");
+	background-image:url("./IMG_7101.JPG");*/
+	color:rgb(255,0,0);
 	width:100%;
 	/* max-width: 750px; */
 	margin: 0;
@@ -38,7 +41,7 @@ body{
 
 /* リンク色変更はここ */
 a{
-	color:#333631;
+	color:rgb(255,165,0);
 	font-weight:bold;
 	text-decoration:none;
 }
@@ -70,7 +73,6 @@ a{
 	margin-left:-375px;
 	width:750px;
 	*/
-	background-color:white;
 	height:60px;
 	text-align: center;
 }
@@ -88,6 +90,7 @@ h1 span{
 
 h1 a{
 	font-size:24px;
+	color:rgb(255,165,0);
 }
 
 .left_link{
@@ -241,11 +244,11 @@ address{
 	background:#333631;
 	padding:3% 0;
 	text-align:center;
-	color:#B2B5B0;
+	color:rgb(255,165,0);
 }
 
 address a{
-	color:#B2B5B0;
+	color:rgb(255,165,0);
 }
 
 
@@ -263,7 +266,7 @@ address a{
 }
 
 #categories_title .category{
-	border-top-color:#FFF;
+	border-top-color:rgb(255,165,0);
 }
 
 #categories_title h2{
@@ -307,14 +310,14 @@ address a{
 	padding-left:3px;
 	border-left:solid 3px #7F827D;
 	font-size:16px;
-	color:#7F827D;}
+	color:rgb(255,165,0);}
 
 .boxes h3 a span{
 	margin-top:1%;
 	display:block;
 	font-size:12px;
 	font-weight:normal;
-	color:#333631;}
+	color:rgb(255,165,0);}
 
 
 /* フッタ-カテゴリリンク群
@@ -343,7 +346,7 @@ address a{
 }
 
 #pan a{
-	color:#7F827D;
+	color:rgb(255,165,0);
 }
 
 /* 当たり情報
@@ -562,7 +565,7 @@ address a{
 	margin:4% 3% 3%;
 	padding:2%;
 	border-left:solid 4px #7F827D;
-	color:#7F827D;
+	color:rgb(255,165,0);
 }
 
 #img_bg{
