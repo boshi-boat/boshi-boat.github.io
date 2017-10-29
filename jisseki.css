@@ -36,7 +36,8 @@ body{
 	margin: 0;
 	font-family: "ヒラギノ丸ゴ ProN","arial black";
 	text-align: center;
-	-webkit-text-size-adjust: 100%;
+	webkit-text-size-adjust: 100%;
+	font-weight:bolder;
 }
 
 /* リンク色変更はここ */
