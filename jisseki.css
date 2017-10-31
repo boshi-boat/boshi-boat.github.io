@@ -60,11 +60,13 @@ a{
 #head{
 	/* background:url(img/head_bg.png) repeat-x left top; */
 	padding:0 0 0 0;
+	width:100%;
 	overflow:hidden;
 	border-bottom:solid 2px #333631;
 	position:fixed;
 	z-index:100;
 	top:0;
+	background-color:rgb(200,200,200);
 	/*
 	position:relative;
 	position:fixed;
