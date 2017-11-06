@@ -78,16 +78,20 @@ $(function() {
     });
     $('.saveTemp').click(function() {
         saveValueToStrage();
+        console.log("save localstorage");
     });
 });
 function setToStrage(htmlID) {
     var kishuID = String($('#kishuID').text());
     var value = $('#' + htmlID).val();
+    console.log(kishuID);
+    console.log(htmlID);
     localStorage[kishuID + '_' + htmlID] = value;
 }
 function saveValueToStrage() {
     $.each($(':text, textarea, input[type="number"], :hidden'), function() {
         var htmlID = $(this).attr('no');
+        console.log(htmlID != 'result');
         // 計算結果は保持しない
         if (htmlID != 'result') {
             setToStrage(htmlID);

@@ -60,6 +60,7 @@ a{
 #head{
 	/* background:url(img/head_bg.png) repeat-x left top; */
 	width:100%;
+	border-top: solid 2px #333631;
 	border-bottom:solid 2px #333631;
 	position:fixed;
 	z-index:100;
