@@ -57,7 +57,7 @@
 		var kishuInfo = dispValue['kishuInfo'];
 
 		$("#kishuID").text(kishuID);
-		console.log(kishuID);
+		console.log($('#kishuID').text(kishuID));
 
 		var kishuName = kishuInfo['name'];
 		$("#kishuName").text(kishuName);
@@ -346,7 +346,7 @@ console.log(kishuInfo);
 </header>
 
 <div id="pan">
-	<a href="https://maru-t.bitbucket.io/">TOP</a> &gt; 機種名：<span id="kishuName"></span>
+	<a href="https://maru-t.bitbucket.io/">TOP</a> &gt; 機種番号：<span id="kishuID"></span> 機種名：<span id="kishuName"></span>
 </div>
 
 <!-- 記事内容ここから -->
