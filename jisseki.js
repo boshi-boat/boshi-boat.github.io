@@ -90,7 +90,7 @@ function setToStrage(htmlID) {
 }
 function saveValueToStrage() {
     $.each($(':text, textarea, input[type="number"], :hidden'), function() {
-        var htmlID = $(this).attr('no');
+        var htmlID = $(this).attr('id');
         console.log(htmlID != 'result');
         // 計算結果は保持しない
         if (htmlID != 'result') {
@@ -105,7 +105,7 @@ function getFromStrage(htmlID) {
 }
 function getFromStrageToForm() {
     $.each($(':text, textarea, input[type="number"], :hidden'), function() {
-        var htmlID = $(this).attr('no');
+        var htmlID = $(this).attr('id');
         // 計算結果は対象外
         if (htmlID != 'result') {
             $('#' + htmlID).val(getFromStrage(htmlID));

@@ -10,7 +10,7 @@
 <script src="./jquery-2.1.4.min.js"></script>
 <script src="./autosize.js?date=20160309"></script>
 <script src="./common.js?date=20160309"></script>
-<script src="./jissekicp.js?date=20160309"></script>
+<script src="./jisseki.js?date=20160309"></script>
 <script>
 	$(function() {
 
@@ -22,34 +22,42 @@
 		switch(pair[1]){
 			case "1":
 				var dispValue = JSON.parse('{"kishuInfo":{"id":"1","name":"\u771f\u30fb\u5317\u6597\u7121\u53cc \u5922\u5e7b\u95d8\u4e71 SWA","tokaBorder":"19.000","totalRate":"29.220","denSupRate":"0.930","rironAveDedama":"408.060","default1R":"90","active":"1"},"kishuAtariInfo":[{"id":"1","no":"1","upDown1":"down","round1":"2","upDown2":"-","round2":"0","roundSum":"2","tamasu":"180","shutsugenRate":"8.800"},{"id":"1","no":"2","upDown1":"down","round1":"3","upDown2":"-","round2":"0","roundSum":"3","tamasu":"270","shutsugenRate":"29.400"},{"id":"1","no":"3","upDown1":"down","round1":"4","upDown2":"-","round2":"0","roundSum":"4","tamasu":"360","shutsugenRate":"47.600"},{"id":"1","no":"4","upDown1":"down","round1":"8","upDown2":"-","round2":"0","roundSum":"8","tamasu":"720","shutsugenRate":"7.000"},{"id":"1","no":"5","upDown1":"down","round1":"12","upDown2":"-","round2":"0","roundSum":"12","tamasu":"1080","shutsugenRate":"3.500"},{"id":"1","no":"6","upDown1":"down","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"1440","shutsugenRate":"3.700"}]}');
+				var kishuID = '1';
 				break;
 			case "2":
 				var dispValue = JSON.parse('{"kishuInfo":{"id":"2","name":"\u771f.\u5317\u6597\u7121\u53cc 1\/219","tokaBorder":"18.000","totalRate":"89.578","denSupRate":"0.740","rironAveDedama":"1237.320","default1R":"140","active":"1"},"kishuAtariInfo":[{"id":"2","no":"1","upDown1":"down","round1":"4","upDown2":"-","round2":"0","roundSum":"4","tamasu":"560","shutsugenRate":"23.300"},{"id":"2","no":"2","upDown1":"down","round1":"6","upDown2":"-","round2":"0","roundSum":"6","tamasu":"840","shutsugenRate":"40.300"},{"id":"2","no":"3","upDown1":"down","round1":"8","upDown2":"-","round2":"0","roundSum":"8","tamasu":"1120","shutsugenRate":"4.200"},{"id":"2","no":"4","upDown1":"down","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"2240","shutsugenRate":"32.200"}]}');
+				var kishuID = '2';
 				break;
 			case "3":
 				var dispValue = JSON.parse('{"kishuInfo":{"id":"3","name":"\u771f\u30fb\u5317\u6597\u7121\u53cc","tokaBorder":"16.800","totalRate":"86.793","denSupRate":"0.780","rironAveDedama":"1289.120","default1R":"140","active":"1"},"kishuAtariInfo":[{"id":"3","no":"1","upDown1":"up","round1":"4","upDown2":"-","round2":"0","roundSum":"4","tamasu":"560","shutsugenRate":"30.700"},{"id":"3","no":"2","upDown1":"up","round1":"6","upDown2":"-","round2":"0","roundSum":"6","tamasu":"840","shutsugenRate":"27.000"},{"id":"3","no":"3","upDown1":"up","round1":"8","upDown2":"-","round2":"0","roundSum":"8","tamasu":"1120","shutsugenRate":"5.100"},{"id":"3","no":"4","upDown1":"up","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"2240","shutsugenRate":"37.200"}]}');
+				var kishuID = '3';
 				break;
 			case "4":
 				var dispValue = JSON.parse('{"kishuInfo":{"id":"4","name":"\u30b9\u30fc\u30d1\u30fc\u6d77\u7269\u8a9eIN\u6c96\u7e044 MTC","tokaBorder":"18.750","totalRate":"105.664","denSupRate":"0.610","rironAveDedama":"1408.000","default1R":"88","active":"1"},"kishuAtariInfo":[{"id":"4","no":"1","upDown1":"down","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"1408","shutsugenRate":"100.000"}]}');
+				var kishuID = '4';
 				break;
 			case "5":
 				var dispValue = JSON.parse('{"kishuInfo":{"id":"5","name":"\u30eb\u30d1\u30f3\u4e09\u4e16\x7eLupin\x20The\x20End\x7e99ver\x2e","tokaBorder":"19.600","totalRate":"35.709","denSupRate":"0.620","rironAveDedama":"1276.000","default1R":"90","active":"1"},"kishuAtariInfo":[{"id":"5","no":"1","upDown1":"down","round1":"2","upDown2":"-","round2":"0","roundSum":"2","tamasu":"180","shutsugenRate":"6.200"},{"id":"5","no":"2","upDown1":"down","round1":"4","upDown2":"-","round2":"0","roundSum":"4","tamasu":"360","shutsugenRate":"59.200"},{"id":"5","no":"3","upDown1":"down","round1":"6","upDown2":"-","round2":"0","roundSum":"6","tamasu":"540","shutsugenRate":"18.700"},{"id":"5","no":"4","upDown1":"down","round1":"8","upDown2":"-","round2":"0","roundSum":"8","tamasu":"720","shutsugenRate":"9.300"},{"id":"5","no":"5","upDown1":"down","round1":"10","upDown2":"-","round2":"0","roundSum":"10","tamasu":"900","shutsugenRate":"5.600"},{"id":"5","no":"6","upDown1":"down","round1":"10","upDown2":"up","round2":"5","roundSum":"15","tamasu":"1350","shutsugenRate":"1.000"}]}');
+				var kishuID = '5';
 				break;
 			case "6":
 				var dispValue = JSON.parse('{"kishuInfo":{"id":"6","name":"スーパー海物語IN沖縄4 SBB","tokaBorder":"20.100","totalRate":"40.288","denSupRate":"0.570","rironAveDedama":"1246.000","default1R":"77","active":"1"},"kishuAtariInfo":[{"id":"6","no":"1","upDown1":"down","round1":"6","upDown2":"-","round2":"0","roundSum":"6","tamasu":"464","shutsugenRate":"95.000"},{"id":"6","no":"2","upDown1":"down","round1":"16","upDown2":"-","round2":"0","roundSum":"16","tamasu":"1237","shutsugenRate":"5.000"}]}');
+				var kishuID = '6';
 				break;
 			case "7":
 				var dispValue = JSON.parse('{"kishuInfo":{"id":"7","name":"大海物語スペシャル SAP13","tokaBorder":"19.100","totalRate":"40.543","denSupRate":"0.560","rironAveDedama":"1312.000","default1R":"81","active":"1"},"kishuAtariInfo":[{"id":"7","no":"1","upDown1":"down","round1":"5","upDown2":"-","round2":"0","roundSum":"5","tamasu":"408","shutsugenRate":"40.000"},{"id":"7","no":"2","upDown1":"down","round1":"7","upDown2":"-","round2":"0","roundSum":"7","tamasu":"571","shutsugenRate":"56.000"},{"id":"7","no":"3","upDown1":"down","round1":"15","upDown2":"-","round2":"0","roundSum":"15","tamasu":"1225","shutsugenRate":"4.000"}]}');
+				var kishuID = '7';
 				break;
 			case "8":
 				var dispValue = JSON.parse('{"kishuInfo":{"id":"8","name":"大海物語2 withアグネスラム SAA","tokaBorder":"18.000","totalRate":"40.223","denSupRate":"0.570","rironAveDedama":"1391","default1R":"99","active":"1"},"kishuAtariInfo":[{"id":"8","no":"1","upDown1":"down","round1":"4","upDown2":"-","round2":"0","roundSum":"4","tamasu":"397","shutsugenRate":"36.000"},{"id":"8","no":"2","upDown1":"down","round1":"6","upDown2":"-","round2":"0","roundSum":"6","tamasu":"596","shutsugenRate":"60.000"},{"id":"8","no":"3","upDown1":"down","round1":"15","upDown2":"-","round2":"0","roundSum":"15","tamasu":"1490","shutsugenRate":"4.000"}]}');
+				var kishuID = '8';
 				break;
 		}
 
 		var kishuInfo = dispValue['kishuInfo'];
 
-		var kishuID = kishuInfo['id'];
 		$("#kishuID").text(kishuID);
+		console.log(kishuID);
 
 		var kishuName = kishuInfo['name'];
 		$("#kishuName").text(kishuName);
